@@ -52,25 +52,7 @@ src/
 └── store/                  # State management global
 ```
 
-## Aturan Kolaborasi
 
-1. Buat branch baru sebelum mengerjakan fitur:
-
-   ```bash
-   git checkout -b feature/nama-fitur
-   ```
-
-2. Gunakan nama branch yang jelas, misalnya `feature/login` atau
-   `fix/navbar`.
-3. Commit perubahan secara teratur dengan pesan yang jelas.
-4. Jangan mengunggah file `.env`, API key, password, atau token ke GitHub.
-5. Pull perubahan terbaru sebelum mulai bekerja:
-
-   ```bash
-   git pull origin main
-   ```
-
-6. Setelah selesai, push branch dan buat Pull Request untuk direview.
 
 ## Catatan
 
