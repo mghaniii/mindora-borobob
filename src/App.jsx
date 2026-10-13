@@ -1,9 +1,15 @@
-import { useState } from 'react'
-
-import './App.css'
+import { BrowserRouter } from 'react-router-dom'
+import { StoreProvider } from './store'
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  return <h1>Frontend contoh</h1>
+  return (
+    <StoreProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </StoreProvider>
+  )
 }
 
 export default App
