@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import logoIcon from '../../../assets/logo-icon.png'
+import logoIcon from '../../assets/logo-icon.png'
 
 // Icon components extracted from Design/Sidebar/Aside.svg
 function DashboardIcon({ className = "w-4 h-4" }) {
@@ -90,7 +90,7 @@ function LogoutIcon({ className = "w-3.5 h-3.5" }) {
   )
 }
 
-export default function Sidebar({ className = "" }) {
+export function Sidebar({ className = "" }) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -123,7 +123,6 @@ export default function Sidebar({ className = "" }) {
   ]
 
   const handleLogout = () => {
-    // Navigasi ke login
     navigate('/login')
   }
 
@@ -236,3 +235,5 @@ export default function Sidebar({ className = "" }) {
     </aside>
   )
 }
+
+export default Sidebar
