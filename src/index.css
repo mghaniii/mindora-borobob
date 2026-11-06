@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+@theme {
+  /* Core Tone Tokens */
+  --color-primary: #6C5CE7;
+  --color-primary-dark: #5341CD;
+  --color-primary-light: #E4DFFF;
+  --color-primary-fg: #FAF6FF;
+
+  --color-secondary: #FFA94D;
+  --color-correct: #51CF66;
+  --color-correct-light: #7FFC97;
+  --color-positive: #51CF66;
+  --color-wrong: #FFDAD6;
+  --color-wrong-light: #FFDAD6;
+  --color-negative: #FFDAD6;
+  --color-shadow: #2D3436;
+  --color-surface: #FAFAFA;
+
+  /* Surfaces & Backgrounds */
+  --color-surface-bg: #F4FAFD;
+  --color-surface-card: #EEF5F7;
+  --color-surface-muted: #DDE4E6;
+  --color-surface-border: #EEF5F7;
+
+  /* Text Colors */
+  --color-text-main: #161D1F;
+  --color-text-muted: #474554;
+  --color-text-subtle: #787586;
+
+  /* Fonts */
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-rubik: 'Rubik', system-ui, sans-serif;
+}
+
+:root {
+  --primary-tone: #6C5CE7;
+  --primary-dark: #5341CD;
+  --secondary-tone: #FFA94D;
+  --correct: #51CF66;
+  --correct-light: #7FFC97;
+  --positive: #51CF66;
+  --wrong: #FFDAD6;
+  --wrong-light: #FFDAD6;
+  --negative: #FFDAD6;
+  --text-shadow: #2D3436;
+  --surface: #FAFAFA;
+
+  /* Figma Compatibility */
+  --Primary: #6C5CE7;
+}

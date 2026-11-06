@@ -29,3 +29,11 @@ dist-ssr
 !.env.example
 coverage/
 *.pem
+
+# Design assets
+Design/
+design/
+
+# Local plans / notes
+rencana.md
+
