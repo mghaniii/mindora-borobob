@@ -1,0 +1,6 @@
+export { default as WelcomeBanner } from './components/WelcomeBanner.jsx'
+export { default as DashboardStats } from './components/DashboardStats.jsx'
+export { default as ContinueLearningCard } from './components/ContinueLearningCard.jsx'
+export { default as MaterialRecommendation } from './components/MaterialRecommendation.jsx'
+export { default as RecommendationCard } from './components/RecommendationCard.jsx'
+export { default as LeaderboardWidget } from './components/LeaderboardWidget.jsx'
