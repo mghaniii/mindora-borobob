@@ -20,7 +20,7 @@ export function Header({
         <div className="relative flex items-center">
           {/* Ikon Kaca Pembesar Pencarian */}
           <svg
-            className="w-4 h-4 text-[#787586] absolute left-3.5 pointer-events-none"
+            className="w-4 h-4 text-text-subtle absolute left-3.5 pointer-events-none"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -36,7 +36,7 @@ export function Header({
             type="text"
             placeholder="Cari materi atau topik..."
             onChange={(e) => onSearch && onSearch(e.target.value)}
-            className="w-full h-11 pl-10 pr-20 bg-white border border-slate-200/80 rounded-xl text-xs font-normal text-zinc-800 placeholder-[#787586] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-xs transition-all"
+            className="w-full h-11 pl-10 pr-20 bg-white border border-slate-200/80 rounded-xl text-xs font-normal text-text-main placeholder:text-text-subtle focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-xs transition-all"
           />
           {/* Badge Pintasan Tombol Ctrl + K */}
           <div className="absolute right-2.5 hidden sm:flex items-center px-2 py-1 bg-[#E8EFF1] rounded-md text-[11px] font-medium text-[#474554]">

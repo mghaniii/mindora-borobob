@@ -32,8 +32,8 @@ export function Button({
     secondary:
       'bg-secondary text-white hover:brightness-105 active:scale-[0.98] ' +
       (glow
-        ? 'shadow-[0px_0px_12px_0px_rgba(255,169,77,0.75)]'
-        : 'hover:shadow-[0px_0px_12px_0px_rgba(255,169,77,0.75)]'),
+        ? 'shadow-[0px_0px_12px_0px_rgba(255,160,72,0.75)]'
+        : 'hover:shadow-[0px_0px_12px_0px_rgba(255,160,72,0.75)]'),
 
     'outline-primary':
       'bg-white border-2 border-primary text-primary hover:bg-primary/5 active:scale-[0.98] ' +
@@ -44,8 +44,8 @@ export function Button({
     'outline-secondary':
       'bg-white border-2 border-secondary text-secondary hover:bg-secondary/5 active:scale-[0.98] ' +
       (glow
-        ? 'shadow-[0px_0px_12px_0px_rgba(255,169,77,0.75)]'
-        : 'hover:shadow-[0px_0px_12px_0px_rgba(255,169,77,0.75)]'),
+        ? 'shadow-[0px_0px_12px_0px_rgba(255,160,72,0.75)]'
+        : 'hover:shadow-[0px_0px_12px_0px_rgba(255,160,72,0.75)]'),
 
     white:
       'bg-white text-primary hover:bg-slate-50 active:scale-[0.98] ' +
