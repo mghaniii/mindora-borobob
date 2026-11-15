@@ -1,4 +1,3 @@
-import React from 'react'
 import Sidebar from '../components/layout/Sidebar.jsx'
 import Header from '../components/layout/Header.jsx'
 import {
@@ -7,9 +6,12 @@ import {
   ContinueLearningCard,
   MaterialRecommendation,
   LeaderboardWidget,
+  useDashboardData,
 } from '../features/dashboard'
 
 export default function Dashboard() {
+  const { summary, continueLearning, recommendations, leaderboard } = useDashboardData()
+
   const handleContinueLearning = () => {
     console.log('Navigasi ke modul pembelajaran saat ini...')
   }
@@ -30,22 +32,43 @@ export default function Dashboard() {
 
         <main className="flex-1 px-6 sm:px-8 pt-4 sm:pt-0 pb-8 max-w-7xl w-full mx-auto flex flex-col gap-6">
           {/* 1. Banner Sambutan dengan Pengukur Target Harian */}
-          <WelcomeBanner onContinue={handleContinueLearning} />
+          <WelcomeBanner
+            name={summary.name}
+            currentTopic={summary.currentTopic}
+            targetPercentage={summary.targetPercentage}
+            spentMinutes={summary.spentMinutes}
+            totalTargetMinutes={summary.totalTargetMinutes}
+            onContinue={handleContinueLearning}
+          />
 
           {/* 2. Tiga Kartu Metrik Ringkasan Statistik */}
-          <DashboardStats />
+          <DashboardStats
+            streakDays={summary.streakDays}
+            totalXp={summary.totalXp}
+            completedModules={summary.completedModules}
+          />
 
           {/* 3. Grid Tata Letak Utama (Pembelajaran, Rekomendasi, & Peringkat) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             {/* Bagian Kiri (2 Kolom): Lanjutkan Belajar & Rekomendasi Materi */}
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <ContinueLearningCard onContinue={handleContinueLearning} />
-              <MaterialRecommendation onSelectMaterial={handleSelectMaterial} />
+              <ContinueLearningCard
+                chapter={continueLearning.chapter}
+                title={continueLearning.title}
+                completedSubtopics={continueLearning.completedSubtopics}
+                totalSubtopics={continueLearning.totalSubtopics}
+                progressPercentage={continueLearning.progressPercentage}
+                onContinue={handleContinueLearning}
+              />
+              <MaterialRecommendation
+                items={recommendations}
+                onSelectMaterial={handleSelectMaterial}
+              />
             </div>
 
             {/* Bagian Kanan (1 Kolom): Widget Peringkat Kelas */}
             <div className="lg:col-span-1">
-              <LeaderboardWidget />
+              <LeaderboardWidget items={leaderboard} />
             </div>
           </div>
         </main>
@@ -53,4 +76,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

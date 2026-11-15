@@ -2,11 +2,11 @@ import React from 'react'
 import Button from '../../../components/common'
 
 export function WelcomeBanner({
-  name = 'Budi',
-  currentTopic = 'Operasi Hitung Campuran',
-  targetPercentage = 68,
-  spentMinutes = 14,
-  totalTargetMinutes = 20,
+  name,
+  currentTopic,
+  targetPercentage,
+  spentMinutes,
+  totalTargetMinutes,
   onContinue,
 }) {
   // Perhitungan lingkaran SVG (r = 38, keliling = 2 * PI * 38 ≈ 238.76)
