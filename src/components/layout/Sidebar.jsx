@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import logoIcon from '../../assets/logo-icon.png'
+import { useAuth } from '../../features/auth'
 
 // Icon components extracted from Design/Sidebar/Aside.svg
 function DashboardIcon({ className = "w-4 h-4" }) {
@@ -93,6 +94,7 @@ function LogoutIcon({ className = "w-3.5 h-3.5" }) {
 export function Sidebar({ className = "" }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const { logout } = useAuth()
 
   const navItems = [
     {
@@ -122,9 +124,10 @@ export function Sidebar({ className = "" }) {
     },
   ]
 
-  const handleLogout = () => {
-    navigate('/login')
-  }
+ const handleLogout = () => {
+  logout()
+  navigate('/login')
+}
 
   return (
     <aside
