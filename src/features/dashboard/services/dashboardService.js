@@ -9,6 +9,9 @@
  */
 
 import { api } from '../../../services/api'
+import thumbnailAljabar from '../../../assets/materi/thumbnail-aljabar-materi.svg'
+import thumbnailGeometri from '../../../assets/materi/thumbnail-geometri-materi.svg'
+import thumbnailStatistika from '../../../assets/materi/thumbnail-statistika-materi.svg'
 
 /**
  * Data contoh (fallback) yang disalin dari tampilan dashboard awal.
@@ -44,6 +47,7 @@ export const MOCK_RECOMMENDATIONS = [
     moduleCount: 6,
     tagColor: 'text-primary',
     bannerBg: 'bg-primary/10',
+    image: thumbnailAljabar,
   },
   {
     id: 'geometri-1',
@@ -53,6 +57,7 @@ export const MOCK_RECOMMENDATIONS = [
     moduleCount: 7,
     tagColor: 'text-secondary',
     bannerBg: 'bg-secondary/15',
+    image: thumbnailGeometri,
   },
   {
     id: 'statistika-1',
@@ -62,6 +67,7 @@ export const MOCK_RECOMMENDATIONS = [
     moduleCount: 5,
     tagColor: 'text-primary',
     bannerBg: 'bg-correct/15',
+    image: thumbnailStatistika,
   },
 ]
 

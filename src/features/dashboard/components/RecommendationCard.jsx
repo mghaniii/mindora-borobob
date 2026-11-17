@@ -22,12 +22,12 @@ export function RecommendationCard({
     >
       <div className="flex flex-col gap-2.5">
         {/* Sampul gambar / thumbnail materi */}
-        <div className={`h-24 w-full ${bannerBg} rounded-xl flex items-center justify-center overflow-hidden relative`}>
+        <div className={`h-24 w-full ${bannerBg} rounded-[32px] flex items-center justify-center overflow-hidden relative`}>
           {image ? (
             <img 
               src={image} 
               alt={title} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+              className="w-full h-full object-cover rounded-[32px] group-hover:scale-105 transition-transform duration-300" 
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-slate-400">
