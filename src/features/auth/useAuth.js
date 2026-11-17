@@ -32,11 +32,23 @@ export function useAuth() {
   }))
 }
 
+  const register = async (data) => {
+    const result = await authService.register(data)
+
+    if (result.ok) {
+      setState((prev) => ({ ...prev, user: result.user }))
+    }
+
+    return result
+  }
+
+  
   return {
-  user: state.user,
-  isLoggedIn: Boolean(state.user),
-  login,
-  logout,
-  markDiagnosticCompleted,
+    user: state.user,
+    isLoggedIn: Boolean(state.user),
+    login,
+    register,
+    logout,
+    markDiagnosticCompleted,
   }
 }
