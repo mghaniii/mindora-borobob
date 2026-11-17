@@ -42,6 +42,11 @@ export function useAuth() {
     return result
   }
 
+
+  const updateProfile = async (data) => {
+    return await authService.updateProfile(data)
+  }
+
   
   return {
     user: state.user,
@@ -50,5 +55,6 @@ export function useAuth() {
     register,
     logout,
     markDiagnosticCompleted,
+    updateProfile,
   }
 }
