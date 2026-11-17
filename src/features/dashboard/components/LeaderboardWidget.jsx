@@ -3,36 +3,9 @@ import React from 'react'
 export function LeaderboardWidget({
   title = 'Peringkat Kelas',
   timeframe = 'Minggu Ini',
-  items,
+  items = [],
 }) {
-  const defaultLeaderboard = [
-    {
-      rank: 1,
-      name: 'Budi Santoso',
-      initials: 'BS',
-      avatar: null,
-      xp: 1620,
-      isCurrentUser: false,
-    },
-    {
-      rank: 2,
-      name: 'Budi (Kamu)',
-      initials: 'BP',
-      avatar: null,
-      xp: 1450,
-      isCurrentUser: true,
-    },
-    {
-      rank: 3,
-      name: 'Dinda Ayu',
-      initials: 'DA',
-      avatar: null,
-      xp: 1380,
-      isCurrentUser: false,
-    },
-  ]
-
-  const leaderboard = items || defaultLeaderboard
+  const leaderboard = items
 
   const getRankBadge = (rank) => {
     switch (rank) {

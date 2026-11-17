@@ -1,0 +1,6 @@
+export { default as LandingNavbar } from './components/LandingNavbar'
+export { default as LandingHero } from './components/LandingHero'
+export { default as LandingHowItWorks } from './components/LandingHowItWorks'
+export { default as LandingFeatures } from './components/LandingFeatures'
+export { default as LandingCtaBanner } from './components/LandingCtaBanner'
+export { default as LandingFooter } from './components/LandingFooter'

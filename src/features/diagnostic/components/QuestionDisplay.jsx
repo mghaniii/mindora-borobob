@@ -76,7 +76,6 @@ export function DiagnosticStatusBar({
 /**
  * Komponen QuestionDisplay
  * Kolom Kiri: Menampilkan Kartu Soal Utama, Alert / Feedback Banner, 3 Langkah Bersusun, Hasil Akhir Terpisah, dan Trik Mental
- * Mengacu presisi pada Design/Section - LeftColumnContent-soal-dan step.png
  */
 export default function QuestionDisplay({ question, selectedAnswer = null }) {
   if (!question) return null

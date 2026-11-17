@@ -12,7 +12,6 @@ import {
 
 /**
  * Halaman Katalog Materi Matematika (Desktop)
- * Mengacu presisi 1:1 pada Design/halaman-materi-design-dekstop.png
  * dan struktur rencana.md
  */
 export default function Materi() {

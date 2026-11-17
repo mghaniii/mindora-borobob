@@ -4,3 +4,4 @@ export { default as ContinueLearningCard } from './components/ContinueLearningCa
 export { default as MaterialRecommendation } from './components/MaterialRecommendation.jsx'
 export { default as RecommendationCard } from './components/RecommendationCard.jsx'
 export { default as LeaderboardWidget } from './components/LeaderboardWidget.jsx'
+export { default as useDashboardData } from './hooks/useDashboardData.js'

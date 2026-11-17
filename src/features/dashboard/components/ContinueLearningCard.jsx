@@ -3,11 +3,11 @@ import Button from '../../../components/common/Button.jsx'
 import iconLanjutkan from '../../../assets/Icon-lanjutkan-dashboard.svg'
 
 export function ContinueLearningCard({
-  chapter = 'Bab 4 • Bilangan Rasional',
-  title = 'Penjumlahan Pecahan Campuran',
-  completedSubtopics = 4,
-  totalSubtopics = 6,
-  progressPercentage = 75,
+  chapter,
+  title,
+  completedSubtopics,
+  totalSubtopics,
+  progressPercentage,
   onContinue,
 }) {
   return (

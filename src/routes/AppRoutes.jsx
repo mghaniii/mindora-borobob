@@ -1,12 +1,15 @@
-
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, useParams, Navigate } from 'react-router-dom'
 import { useAuth } from '../features/auth'
+
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
 import Dashboard from '../pages/Dashboard'
 import Diagnostic from '../pages/Diagnostic'
+import DiagnosticHistory from '../pages/DiagnosticHistory'
 import Materi from '../pages/Materi'
+import Latihan from '../pages/Latihan'
+import LatihanKuis from '../pages/LatihanKuis'
 import ForgotPassword from '../pages/ForgotPassword'
 import ResetPassword from '../pages/ResetPassword'
 import Profile from '../pages/Profile'
@@ -21,6 +24,12 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+// Remount saat itemId berganti agar state kuis selalu segar
+function LatihanKuisRoute() {
+  const { itemId } = useParams()
+  return <LatihanKuis key={itemId} />
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -30,14 +39,13 @@ export default function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <Profile />
-    </ProtectedRoute>
-  }
-/>
-
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={
@@ -46,7 +54,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/materi"
         element={
@@ -55,12 +62,35 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
+      <Route
+        path="/latihan"
+        element={
+          <ProtectedRoute>
+            <Latihan />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/latihan/:itemId"
+        element={
+          <ProtectedRoute>
+            <LatihanKuisRoute />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/diagnostic"
         element={
           <ProtectedRoute>
             <Diagnostic />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/riwayat-diagnostik"
+        element={
+          <ProtectedRoute>
+            <DiagnosticHistory />
           </ProtectedRoute>
         }
       />
