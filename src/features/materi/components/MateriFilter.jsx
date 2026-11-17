@@ -18,7 +18,7 @@ export function MateriFilter({ activeTab = 'all', onSelectTab }) {
             className={`px-4 sm:px-5 py-2.5 rounded-full font-rubik text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
               isActive
                 ? 'bg-primary text-white shadow-xs'
-                : 'bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50'
+                : 'bg-white text-text-muted hover:bg-slate-50'
             }`}
           >
             <span>{cat.label}</span>

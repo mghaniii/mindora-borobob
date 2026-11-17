@@ -1,6 +1,5 @@
 /**
  * Service & Data Model untuk Katalog Materi Matematika
- * Mengacu presisi pada Design/halaman-materi-design-dekstop.png
  */
 
 export const CATEGORIES = [

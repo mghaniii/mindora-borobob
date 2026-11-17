@@ -1,10 +1,6 @@
 import React from 'react'
 
-export function DashboardStats({
-  streakDays = 3,
-  totalXp = 420,
-  completedModules = 12,
-}) {
+export function DashboardStats({ streakDays, totalXp, completedModules }) {
   // Daftar data metrik ringkasan (Streak, XP, dan Modul Selesai)
   const stats = [
     {

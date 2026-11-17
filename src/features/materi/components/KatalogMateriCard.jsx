@@ -6,7 +6,6 @@ import iconGembok from '../../../assets/materi/icon-gembok-materi.svg'
 /**
  * Komponen KatalogMateriCard
  * Kartu pembelajaran pada Halaman Katalog Materi Matematika
- * Mengacu presisi 1:1 pada Design/halaman-materi-design-dekstop.png
  */
 export function KatalogMateriCard({
   category = 'Aljabar Dasar',

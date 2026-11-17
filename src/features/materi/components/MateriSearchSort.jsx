@@ -15,28 +15,38 @@ export function MateriSearchSort({
   onSortChange,
 }) {
   return (
-    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-1">
-      {/* 1. Input Pencarian Kapsul (rounded-full) */}
+    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 lg:gap-10 pt-1">
+      {/* 1. Input Pencarian (rounded-xl, identik dengan Header) */}
       <div className="flex-1 max-w-md relative">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <div className="relative flex items-center">
+          {/* Ikon Kaca Pembesar Pencarian */}
+          <svg
+            className="w-4 h-4 text-text-subtle absolute left-3.5 pointer-events-none"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Cari materi, rumus, konsep.."
+            className="w-full h-11 pl-10 pr-4 bg-white border border-slate-200/80 rounded-xl text-xs font-normal text-text-main placeholder:text-text-subtle focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-xs transition-all"
+          />
         </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Cari materi, rumus, konsep..."
-          className="w-full h-11 pl-11 pr-4 bg-white border border-slate-200/90 rounded-full text-xs sm:text-sm font-rubik text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-2xs transition-all"
-        />
       </div>
 
       {/* 2. Dropdown Status & Urutan (rounded-full) */}
-      <div className="flex items-center gap-3 self-end sm:self-auto flex-wrap">
+     <div className="flex items-center gap-3 self-end sm:self-auto flex-wrap">
         {/* Dropdown Status */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200/90 rounded-full shadow-2xs text-xs sm:text-sm font-rubik">
+         <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-2xs text-xs sm:text-sm font-rubik">
           <span className="text-slate-500 font-medium">Status:</span>
           <select
             value={statusFilter}
@@ -52,12 +62,14 @@ export function MateriSearchSort({
         </div>
 
         {/* Dropdown Urutan */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200/90 rounded-full shadow-2xs text-xs sm:text-sm font-rubik">
+        <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-2xs text-xs sm:text-sm font-rubik">
           <span className="text-slate-500 font-medium">Urutkan:</span>
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
-            className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer pr-1"
+            className={`bg-transparent font-bold focus:outline-none cursor-pointer pr-1 ${
+              sortBy === 'rekomendasi' ? 'text-primary-dark' : 'text-slate-800'
+            }`}
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

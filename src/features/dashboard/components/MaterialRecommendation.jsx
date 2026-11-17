@@ -4,41 +4,11 @@ import RecommendationCard from './RecommendationCard.jsx'
 export function MaterialRecommendation({
   title = 'Rekomendasi Materi',
   subtitle = 'Pilihan topik esensial untuk kelas XI',
-  items,
+  items = [],
   onSeeAll,
   onSelectMaterial,
 }) {
-  const defaultItems = [
-    {
-      id: 'aljabar-1',
-      category: 'Aljabar',
-      title: 'Aljabar Dasar Mudah',
-      description: 'Mengenal variabel, suku sejenis, dan model matematika sederhana.',
-      moduleCount: 6,
-      tagColor: 'text-primary',
-      bannerBg: 'bg-primary/10',
-    },
-    {
-      id: 'geometri-1',
-      category: 'Geometri',
-      title: 'Geometri & Bangun Datar',
-      description: 'Eksplorasi keliling, luas bidang, dan sudut poligon.',
-      moduleCount: 7,
-      tagColor: 'text-secondary',
-      bannerBg: 'bg-secondary/15',
-    },
-    {
-      id: 'statistika-1',
-      category: 'Statistika',
-      title: 'Statistika & Data',
-      description: 'Membaca diagram batang, garis, dan menghitung nilai rata-rata.',
-      moduleCount: 5,
-      tagColor: 'text-primary',
-      bannerBg: 'bg-correct/15',
-    },
-  ]
-
-  const materials = items || defaultItems
+  const materials = items
 
   return (
     <div className="w-full flex flex-col gap-4">
