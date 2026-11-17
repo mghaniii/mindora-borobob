@@ -310,10 +310,27 @@ export function useDiagnosticLogic({ totalTimeSeconds = 600, onComplete } = {}) 
   const handleSubmitTest = async () => {
     setIsSubmitting(true)
 
+    const domainStats = {}
+    questions.forEach((q) => {
+      if (!domainStats[q.category]) {
+        domainStats[q.category] = { name: q.category, correct: 0, total: 0 }
+      }
+      domainStats[q.category].total += 1
+      if (answers[q.id]?.selectedOption === q.correctOption) {
+        domainStats[q.category].correct += 1
+      }
+    })
+
     const submissionPayload = {
       completedAt: new Date().toISOString(),
       totalTimeSpentSeconds: totalTimeSeconds - timeRemaining,
       totalQuestions: questions.length,
+      score: Object.values(domainStats).reduce((n, d) => n + d.correct, 0),
+      total: questions.length,
+      domains: Object.values(domainStats).map((d) => ({
+        name: d.name,
+        percent: Math.round((d.correct / d.total) * 100),
+      })),
       answers: Object.entries(answers).map(([qId, ans]) => ({
         questionId: Number(qId),
         selectedOption: ans.selectedOption,

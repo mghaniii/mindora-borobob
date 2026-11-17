@@ -96,6 +96,8 @@ function ProfileContent({ user }) {
 
   const stats = getLearningStats(user.id)
   const result = getDiagnosticResult(user.id)
+  // Hasil tersimpan versi lama belum punya domains; jangan render rincian dari bentuk itu
+  const resultDetail = Array.isArray(result?.domains) ? result : null
   const level = Math.floor(stats.xp / 500) + 1
 
   useEffect(() => {
@@ -125,10 +127,10 @@ function ProfileContent({ user }) {
     `Akurasi soal: ${stats.accuracy}% (data demo)`,
     `Medali: ${stats.medals} (data demo)`,
     '',
-    result
-      ? `Tes diagnostik: ${result.score}/${result.total}\n` +
-        result.domains.map((d) => `- ${d.name}: ${d.percent}%`).join('\n')
-      : user.hasCompletedDiagnostic
+    resultDetail
+      ? `Tes diagnostik: ${resultDetail.score}/${resultDetail.total}\n` +
+        resultDetail.domains.map((d) => `- ${d.name}: ${d.percent}%`).join('\n')
+      : user.hasCompletedDiagnostic || result
         ? 'Tes diagnostik: sudah dikerjakan (rincian belum tersedia).'
         : 'Tes diagnostik: belum dikerjakan.',
   ].join('\n')
@@ -348,17 +350,17 @@ function ProfileContent({ user }) {
                     <p className="text-sm font-medium text-[#474554]">Evaluasi domain kompetensi Kurikulum Merdeka</p>
                   </div>
                 </div>
-                {result && (
+                {resultDetail && (
                   <span className="inline-flex items-center gap-2 rounded-full bg-[#FFDFC0] px-5 py-3 text-base font-semibold">
                     <BadgeCheckIcon size={20} />
-                    {result.score} / {result.total} &bull; {scoreLabel(result.score, result.total)}
+                    {resultDetail.score} / {resultDetail.total} &bull; {scoreLabel(resultDetail.score, resultDetail.total)}
                   </span>
                 )}
               </div>
 
-              {result ? (
+              {resultDetail ? (
                 <div className="mt-8 flex flex-col gap-5">
-                  {result.domains.map((domain) => {
+                  {resultDetail.domains.map((domain) => {
                     const label = domainLabel(domain.percent)
                     return (
                       <div key={domain.name}>
@@ -384,12 +386,12 @@ function ProfileContent({ user }) {
               ) : (
                 <div className="mt-8 rounded-xl bg-[#EDF3F5] px-6 py-10 text-center">
                   <p className="text-base font-medium">
-                    {user.hasCompletedDiagnostic
+                    {user.hasCompletedDiagnostic || result
                       ? 'Rincian hasil tes diagnostik belum tersedia di profil.'
                       : 'Kamu belum mengerjakan tes diagnostik.'}
                   </p>
                   <p className="mt-1 text-sm text-[#474554]">
-                    {user.hasCompletedDiagnostic
+                    {user.hasCompletedDiagnostic || result
                       ? 'Skor dan progres tiap domain akan tampil di sini setelah datanya tersedia.'
                       : 'Kerjakan tes untuk melihat progres tiap domain matematikamu.'}
                   </p>
