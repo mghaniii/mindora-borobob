@@ -25,6 +25,8 @@
   --color-surface-card: #EEF5F7;
   --color-surface-muted: #DDE4E6;
   --color-surface-border: #EEF5F7;
+  --color-surface-stroke: #EBE7E0;
+  --color-surface-status: #EEFAF0;
 
   /* Text Colors */
   --color-text-main: #161D1F;
@@ -34,6 +36,9 @@
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-rubik: 'Rubik', system-ui, sans-serif;
+
+  /* Lebar minimum saat judul kartu + baris tab filter (±1000px) muat berdampingan */
+  --breakpoint-wide: 88.75rem;
 }
 
 :root {
@@ -51,6 +56,11 @@
 
   /* Figma Compatibility */
   --Primary: #6C5CE7;
+}
+
+/* Anchor navbar landing page menggulir halus */
+html {
+  scroll-behavior: smooth;
 }
 
 /* Scrollbar mengikuti palet aplikasi */
@@ -72,6 +82,15 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
+}
+
+/* Sembunyikan scrollbar pada container scroll horizontal (mis. tab filter) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes fade-up {
