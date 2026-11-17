@@ -11,6 +11,8 @@ import {
   useDiagnosticLogic,
 } from '../features/diagnostic'
 import Button from '../components/common/Button'
+import { useAuth } from '../features/auth'
+import { saveDiagnosticResult } from '../features/auth/authService'
 
 /**
  * Halaman Utama Diagnostic (Tes Adaptif)
@@ -19,17 +21,20 @@ import Button from '../components/common/Button'
  */
 export default function Diagnostic() {
   const navigate = useNavigate()
+  const { markDiagnosticCompleted, logout } = useAuth()
   const [currentStep, setCurrentStep] = useState('intro') // 'intro' | 'question' | 'result'
   const [submissionResult, setSubmissionResult] = useState(null)
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
 
-  // Hook Logika Diagnostik
+    // Hook Logika Diagnostik
   const diagnostic = useDiagnosticLogic({
-    totalTimeSeconds: 600, // 10 menit
+    totalTimeSeconds: 600,
     onComplete: (payload) => {
-      setSubmissionResult(payload)
-      setCurrentStep('result')
-    },
+  saveDiagnosticResult(payload)
+  markDiagnosticCompleted()
+  setSubmissionResult(payload)
+  setCurrentStep('result')
+},
   })
 
   const handleStartTest = () => {
@@ -37,8 +42,9 @@ export default function Diagnostic() {
   }
 
   const handleExit = () => {
-    navigate('/dashboard')
-  }
+  logout()
+  navigate('/login', { replace: true })
+}
 
   return (
     <div className="min-h-screen w-full bg-[#F7F9FB] flex flex-col justify-between selection:bg-primary/20 selection:text-primary">

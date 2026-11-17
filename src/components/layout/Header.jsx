@@ -1,4 +1,5 @@
 import React from 'react'
+import { useStore } from '../../store'
 
 /**
  * Komponen Header Dashboard
@@ -7,12 +8,21 @@ import React from 'react'
  * Sesuai referensi visual Design/Header bagian.svg
  */
 export function Header({
-  userName = 'Budi Pratama',
+  userName: userNameProp,
   userGrade = 'Kelas 2 SMA',
   userAvatar = null,
   notificationCount = 2,
   onSearch,
 }) {
+  const { state } = useStore()
+  const userName = userNameProp ?? state.user?.name ?? 'Budi Pratama'
+  const initials = userName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('')
+
   return (
     <header className="h-[96px] w-full bg-surface-bg/90 backdrop-blur-md px-6 sm:px-8 pt-4 pb-3 flex items-center justify-end gap-5 sticky top-0 z-30 transition-all">
       {/* Kolom pencarian dengan pintasan Ctrl + K */}
@@ -90,7 +100,7 @@ export function Header({
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-primary/10 ring-2 ring-[#E4DFFF] text-primary font-bold text-xs flex items-center justify-center shrink-0">
-              BP
+              {initials}
             </div>
           )}
 
