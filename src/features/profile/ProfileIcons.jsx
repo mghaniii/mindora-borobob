@@ -141,3 +141,22 @@ export const HomeIcon = (p) => (
     <path d="m3 11 9-8 9 8M5 10v10h14V10" />
   </Svg>
 )
+export const SearchIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
+  </Svg>
+)
+
+export const SparklesIcon = (p) => (
+  <Svg {...p}>
+    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+  </Svg>
+)
+
+export const LockIcon = (p) => (
+  <Svg {...p}>
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </Svg>
+)

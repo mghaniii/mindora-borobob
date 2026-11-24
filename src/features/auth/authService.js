@@ -315,5 +315,32 @@ export function getLearningStats(userId) {
 
 export function getProfileExtras(userId) {
   const allExtras = read('mindora_profile_extras', {})
-  return allExtras[userId] || {}
+  const allPreferences = read('mindora_preferences', {})
+
+  return {
+    ...(allExtras[userId] || {}),
+    ...(allPreferences[userId] || {}),
+  }
+}
+
+
+export function updateProfile(data) {
+  const session = getSession()
+
+  if (!session) {
+    return { ok: false, error: 'Sesi pengguna tidak ditemukan.' }
+  }
+
+  const allExtras = read('mindora_profile_extras', {})
+  const currentExtras = allExtras[session.id] || {}
+
+  write('mindora_profile_extras', {
+    ...allExtras,
+    [session.id]: {
+      ...currentExtras,
+      bio: String(data.bio ?? '').trim(),
+    },
+  })
+
+  return { ok: true }
 }
