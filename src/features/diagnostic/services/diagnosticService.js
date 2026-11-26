@@ -10,6 +10,16 @@
 
 import { api } from '../../../services/api'
 
+export const getDiagnosticQuestions = async () => {
+  const response = await api.get('/diagnostic/questions')
+  return response.data
+}
+
+export const submitDiagnostic = async (payload) => {
+  const response = await api.post('/diagnostic/submit', payload)
+  return response.data
+}
+
 // 1. Ringkasan Hasil Diagnostik Utama (card atas)
 export const MOCK_SUMMARY = {
   score: 92,

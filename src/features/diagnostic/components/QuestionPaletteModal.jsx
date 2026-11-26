@@ -9,6 +9,7 @@ export default function QuestionPaletteModal({
   isOpen = false,
   onClose,
   totalQuestions = 15,
+  questions = [],
   currentIndex = 0,
   answers = {},
   onSelectQuestion,
@@ -53,7 +54,9 @@ export default function QuestionPaletteModal({
         {/* Grid Nomor Soal (5 Kolom x 3 Baris) */}
         <div className="grid grid-cols-5 gap-3 py-1">
           {Array.from({ length: totalQuestions }, (_, index) => {
-            const questionId = index + 1
+            const question = questions[index] || {}
+            const questionId = question.id ?? index + 1
+            const questionNumber = question.number ?? index + 1
             const answer = answers[questionId]
             const isAnswered = Boolean(answer?.selectedOption)
             const isMarkedDoubtful = Boolean(answer?.isDoubtful)
@@ -84,7 +87,7 @@ export default function QuestionPaletteModal({
                 }}
                 className={`h-11 rounded-xl border flex flex-col items-center justify-center font-rubik text-sm transition-all duration-150 cursor-pointer active:scale-95 ${badgeStyle}`}
               >
-                <span>{questionId}</span>
+                <span>{questionNumber}</span>
               </button>
             )
           })}

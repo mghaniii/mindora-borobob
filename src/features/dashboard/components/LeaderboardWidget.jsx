@@ -7,6 +7,15 @@ export function LeaderboardWidget({
 }) {
   const leaderboard = items
 
+  if (leaderboard.length === 0) {
+    return (
+      <div className="w-full p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-2">
+        <h2 className="text-zinc-900 text-lg font-bold">{title}</h2>
+        <p className="text-sm text-gray-500">Belum ada peringkat kelas minggu ini.</p>
+      </div>
+    )
+  }
+
   const getRankBadge = (rank) => {
     switch (rank) {
       case 1:
@@ -36,7 +45,7 @@ export function LeaderboardWidget({
       <div className="flex flex-col gap-2">
         {leaderboard.map((user) => (
           <div
-            key={user.rank}
+            key={user.id}
             className={`p-2 rounded-2xl flex items-center justify-between transition-colors ${
               user.isCurrentUser
                 ? 'bg-primary/10 border border-primary/20'
@@ -64,7 +73,7 @@ export function LeaderboardWidget({
                       : 'bg-slate-200 text-zinc-700'
                   }`}
                 >
-                  {user.initials}
+                  {user.initials || '?'}
                 </div>
               )}
 

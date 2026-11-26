@@ -1,372 +1,245 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { getDiagnosticQuestions, submitDiagnostic } from '../services/diagnosticService.js'
 
-/**
- * Data awal simulasi tes diagnostik adaptif matematika
- * Terstruktur tujuan kedepannya response REST API backend / database
- */
-const INITIAL_QUESTIONS = [
-  {
-    id: 1,
-    number: 1,
-    category: 'PENJUMLAHAN',
-    topic: 'ADAPTIF MATEMATIKA DASAR',
-    questionText: '27 + 35 = ....',
-    instruction: 'Evaluasi hasil operasi penjumlahan di atas dengan memilih salah satu jawaban yang paling tepat.',
-    alertMessage: 'Perhatikan digit puluhan dan satuan secara terpisah untuk meminimalisir kesalahan perhitungan.',
-    stepsHeader: 'CARA PENYELESAIAN BERSUSUN',
-    stepsBadge: 'Langkah demi Langkah',
-    steps: [
-      {
-        step: 1,
-        title: 'Kolom Satuan (Digit Terakhir)',
-        formula: '7 + 5',
-        description: 'Hitung penjumlahan digit satuan: 7 + 5 = 12. Tulis angka 2 pada kolom satuan, lalu simpan 1 di atas kolom puluhan.',
-      },
-      {
-        step: 2,
-        title: 'Kolom Puluhan Bersama Simpanan',
-        formula: '1 + 2 + 3',
-        description: 'Jumlahkan simpanan bersama digit puluhan: 1 (simpanan) + 2 + 3 = 6. Tulis angka 6 pada kolom puluhan.',
-      },
-      {
-        step: 3,
-        title: 'Penggabungan Puluhan & Satuan',
-        formula: '60 + 2',
-        description: 'Gabungkan nilai puluhan dan satuan untuk mendapatkan hasil akhir: 60 + 2 = 62.',
-      },
-    ],
-    finalResult: {
-      equation: '27 + 35 = 62',
-      correctOptionLabel: 'Jawaban Benar: Opsi B',
-    },
-    options: [
-      { id: 'A', label: '12', isCorrect: false },
-      { id: 'B', label: '62', isCorrect: true },
-      { id: 'C', label: '70', isCorrect: false },
-      { id: 'D', label: '32', isCorrect: false },
-    ],
-    hint: 'Gunakan penguraian nilai tempat: (20 + 30) + (7 + 5) = 50 + 12 = 62. Pisahkan puluhan dan satuan agar dapat dikalkulasikan seketika di memori tanpa coret-coretan pensil.',
-    hintTag: 'Dekomposisi Nilai Tempat',
-    correctOption: 'B',
-  },
-  {
-    id: 2,
-    number: 2,
-    category: 'PENJUMLAHAN TIGA ANGKA',
-    topic: 'ADAPTIF MATEMATIKA DASAR',
-    questionText: '146 + 238 = ....',
-    instruction: 'Tentukan hasil penjumlahan bilangan tiga angka di atas dengan teliti.',
-    alertMessage: 'Perhatikan teknik menyimpan saat menjumlahkan nilai satuan ke puluhan.',
-    stepsHeader: 'CARA PENYELESAIAN BERSUSUN',
-    stepsBadge: 'Langkah demi Langkah',
-    steps: [
-      {
-        step: 1,
-        title: 'Penjumlahan Digit Satuan',
-        formula: '6 + 8',
-        description: 'Hitung penjumlahan digit satuan: 6 + 8 = 14. Tulis angka 4 pada kolom satuan, lalu simpan 1 di atas kolom puluhan.',
-      },
-      {
-        step: 2,
-        title: 'Penjumlahan Digit Puluhan',
-        formula: '1 + 4 + 3',
-        description: 'Jumlahkan digit puluhan bersama angka simpanan: 1 (simpanan) + 4 + 3 = 8. Tulis angka 8 pada kolom puluhan.',
-      },
-      {
-        step: 3,
-        title: 'Penjumlahan Digit Ratusan',
-        formula: '1 + 2',
-        description: 'Jumlahkan digit ratusan: 1 + 2 = 3. Tulis angka 3 pada kolom ratusan. Hasil keseluruhan adalah 384.',
-      },
-    ],
-    finalResult: {
-      equation: '146 + 238 = 384',
-      correctOptionLabel: 'Jawaban Benar: Opsi B',
-    },
-    options: [
-      { id: 'A', label: '374', isCorrect: false },
-      { id: 'B', label: '384', isCorrect: true },
-      { id: 'C', label: '394', isCorrect: false },
-      { id: 'D', label: '404', isCorrect: false },
-    ],
-    hint: '(100 + 200) + (40 + 30) + (6 + 8) = 300 + 70 + 14 = 384. Pisahkan per nilai tempat ratusan, puluhan, dan satuan untuk kalkulasi instan di kepala.',
-    hintTag: 'Pengelompokan Ratusan',
-    correctOption: 'B',
-  },
-  {
-    id: 3,
-    number: 3,
-    category: 'PERKALIAN',
-    topic: 'ADAPTIF MATEMATIKA DASAR',
-    questionText: '14 × 6 = ....',
-    instruction: 'Hitunglah hasil perkalian bilangan di atas.',
-    alertMessage: 'Uraikan angka 14 menjadi penjumlahan puluhan dan satuan sebelum mengalikan.',
-    stepsHeader: 'CARA PENYELESAIAN BERSUSUN',
-    stepsBadge: 'Langkah demi Langkah',
-    steps: [
-      {
-        step: 1,
-        title: 'Kalikan Nilai Puluhan',
-        formula: '10 × 6',
-        description: 'Kalikan digit puluhan dengan pengali: 10 × 6 = 60.',
-      },
-      {
-        step: 2,
-        title: 'Kalikan Nilai Satuan',
-        formula: '4 × 6',
-        description: 'Kalikan digit satuan dengan pengali: 4 × 6 = 24.',
-      },
-      {
-        step: 3,
-        title: 'Jumlahkan Kedua Hasil Perkalian',
-        formula: '60 + 24',
-        description: 'Jumlahkan hasil perkalian puluhan dan satuan: 60 + 24 = 84.',
-      },
-    ],
-    finalResult: {
-      equation: '14 × 6 = 84',
-      correctOptionLabel: 'Jawaban Benar: Opsi C',
-    },
-    options: [
-      { id: 'A', label: '64', isCorrect: false },
-      { id: 'B', label: '74', isCorrect: false },
-      { id: 'C', label: '84', isCorrect: true },
-      { id: 'D', label: '94', isCorrect: false },
-    ],
-    hint: 'Pisahkan menjadi (10 × 6) + (4 × 6) = 60 + 24 = 84.',
-    hintTag: 'Distributif Perkalian',
-    correctOption: 'C',
-  },
-  {
-    id: 4,
-    number: 4,
-    category: 'PERKALIAN BERSUSUN',
-    topic: 'ADAPTIF MATEMATIKA DASAR',
-    questionText: '24 × 15 = ....',
-    instruction: 'Evaluasi jawaban perkalian bersusun dua digit di atas.',
-    alertMessage: 'Perhatikan digit puluhan dan satuan pengali secara terpisah saat mengalikan bersusun.',
-    stepsHeader: 'CARA PENYELESAIAN BERSUSUN',
-    stepsBadge: 'Langkah demi Langkah',
-    steps: [
-      {
-        step: 1,
-        title: 'Perkalian dengan Satuan Pengali (angka 5)',
-        formula: '24 × 5',
-        description: 'Kalikan 4 × 5 = 20 (tulis 0, simpan 2). Lalu 2 × 5 = 10 + 2 = 12 . Hasil baris pertama: 120.',
-      },
-      {
-        step: 2,
-        title: 'Perkalian dengan Puluhan Pengali (angka 1)',
-        formula: '24 × 10',
-        description: 'Kalikan 24 dengan 1 puluhan (geser 1 posisi ke kiri): 24 × 1 = 24 . Hasil baris kedua: 240.',
-      },
-      {
-        step: 3,
-        title: 'Penjumlahan Hasil Baris',
-        formula: '120 + 240',
-        description: 'Jumlahkan kedua baris perhitungan: 120 + 240 = 360 .',
-      },
-    ],
-    finalResult: {
-      equation: '24 × 15 = 360',
-      correctOptionLabel: 'Jawaban Benar: Opsi A',
-    },
-    options: [
-      { id: 'A', label: '360', isCorrect: true },
-      { id: 'B', label: '240', isCorrect: false },
-      { id: 'C', label: '340', isCorrect: false },
-      { id: 'D', label: '380', isCorrect: false },
-    ],
-    hint: '24 × 15 = (24 ÷ 2) × (15 × 2) = 12 × 30 = 360! Sangat mudah dihitung di luar kepala.',
-    hintTag: 'Aturan Dobel & Separuh',
-    correctOption: 'A',
-  },
-]
+const getErrorMessage = (error, fallback) =>
+  typeof error === 'string' ? error : error?.data?.message || error?.message || fallback
 
-// Lengkapi soal 4 sampai 15 secara dinamis jika diperlukan
-// for (let i = 4; i <= 15; i++) {
-//   INITIAL_QUESTIONS.push({
-//     id: i,
-//     number: i,
-//     category: i % 2 === 0 ? 'ALJABAR DASAR' : 'PECAHAN',
-//     topic: 'ADAPTIF MATEMATIKA DASAR',
-//     questionText: i % 2 === 0 ? `Tentukan nilai x jika 2x + ${i} = ${i * 3}` : `Hitunglah: 1/${(i % 4) + 2} + 2/${(i % 4) + 2} = ....`,
-//     instruction: 'Pilihlah salah satu jawaban yang menurut Anda paling tepat.',
-//     alertMessage: 'Selesaikan persamaan atau samakan penyebut pecahan sebelum menjumlahkan.',
-//     steps: [
-//       { step: 1, label: `Langkah analisis perhitungan awal nomor ${i}` },
-//       { step: 2, label: `Sederhanakan kedua ruas persamaan` },
-//       { step: 3, label: `Hasil akhir nomor ${i}: ${i * 2}`, isResult: true },
-//     ],
-//     options: [
-//       { id: 'A', label: `${i * 2 - 1}` },
-//       { id: 'B', label: `${i * 2}` },
-//       { id: 'C', label: `${i * 2 + 1}` },
-//       { id: 'D', label: `${i * 2 + 2}` },
-//     ],
-//     hint: 'Fokus pada langkah dekomposisi awal sebelum menghitung hasil akhir.',
-//     correctOption: 'B',
-//   })
-// }
+const createSubmissionId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
+    const random = Math.floor(Math.random() * 16)
+    const value = char === 'x' ? random : (random & 0x3) | 0x8
+    return value.toString(16)
+  })
+}
 
-/**
- * Custom Hook: useDiagnosticLogic
- * Menangani state diagnostik, timer mundur, penyimpanan jawaban, reset opsi, dan pengiriman ke backend
- */
 export function useDiagnosticLogic({ totalTimeSeconds = 600, onComplete } = {}) {
-  const [questions, setQuestions] = useState(INITIAL_QUESTIONS)
+  const [questions, setQuestions] = useState([])
+  const [questionsStatus, setQuestionsStatus] = useState('loading')
+  const [loadError, setLoadError] = useState(null)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState({}) // { [questionId]: { selectedOption: 'B', isDoubtful: false } }
+  const [answers, setAnswers] = useState({})
   const [timeRemaining, setTimeRemaining] = useState(totalTimeSeconds)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
   const [isFinished, setIsFinished] = useState(false)
+  const [isStarted, setIsStarted] = useState(false)
+  const [completionResult, setCompletionResult] = useState(null)
+  const submissionIdRef = useRef(null)
+  const submitInFlightRef = useRef(false)
+  const autoSubmitAttemptedRef = useRef(false)
+  const startedAtRef = useRef(null)
+  const deadlineRef = useRef(null)
 
-  // Timer mundur otomatis
   useEffect(() => {
-    if (isFinished || timeRemaining <= 0) return
+    let cancelled = false
 
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          handleSubmitTest()
-          return 0
+    getDiagnosticQuestions()
+      .then((items) => {
+        if (cancelled) return
+        if (!Array.isArray(items) || items.length === 0) {
+          setQuestions([])
+          setLoadError('Soal diagnostik belum tersedia.')
+          setQuestionsStatus('error')
+          return
         }
-        return prev - 1
+        setQuestions(items)
+        setQuestionsStatus('ready')
       })
-    }, 1000)
+      .catch((error) => {
+        if (cancelled) return
+        setLoadError(error)
+        setQuestionsStatus('error')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [loadAttempt])
+
+  const retryLoadQuestions = useCallback(() => {
+    setQuestionsStatus('loading')
+    setLoadError(null)
+    setLoadAttempt((value) => value + 1)
+  }, [])
+
+  const currentQuestion = questions[currentIndex] || null
+  const currentAnswer = currentQuestion ? answers[currentQuestion.id] || null : null
+
+  const startTest = useCallback(() => {
+    if (questionsStatus !== 'ready' || questions.length === 0) return
+    submissionIdRef.current = createSubmissionId()
+    autoSubmitAttemptedRef.current = false
+    startedAtRef.current = Date.now()
+    deadlineRef.current = startedAtRef.current + totalTimeSeconds * 1000
+    setAnswers({})
+    setCurrentIndex(0)
+    setTimeRemaining(totalTimeSeconds)
+    setSubmitError(null)
+    setCompletionResult(null)
+    setIsFinished(false)
+    setIsStarted(true)
+  }, [questions, questionsStatus, totalTimeSeconds])
+
+  const handleSubmitTest = useCallback(async () => {
+    if (submitInFlightRef.current || questions.length === 0 || isFinished) return
+
+    const answerRows = questions.map((question) => ({
+      questionId: question.id,
+      selectedOption: answers[question.id]?.selectedOption ?? null,
+      isDoubtful: Boolean(answers[question.id]?.isDoubtful),
+    }))
+
+    if (!answerRows.some((answer) => answer.selectedOption)) {
+      setSubmitError('Jawab minimal satu soal sebelum mengumpulkan tes.')
+      return
+    }
+
+    submitInFlightRef.current = true
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    const totalTimeSpentSeconds = Math.min(
+      totalTimeSeconds,
+      Math.max(0, Math.floor((Date.now() - (startedAtRef.current || Date.now())) / 1000)),
+    )
+    const submissionId = submissionIdRef.current || createSubmissionId()
+    submissionIdRef.current = submissionId
+
+    try {
+      const serverResult = await submitDiagnostic({
+        submissionId,
+        totalTimeSpentSeconds,
+        answers: answerRows,
+      })
+      const localResult = {
+        ...serverResult,
+        score: serverResult.totalCorrect,
+        total: serverResult.totalQuestions ?? questions.length,
+        scorePercent: serverResult.score,
+      }
+      setCompletionResult(localResult)
+      setIsFinished(true)
+      onComplete?.(localResult)
+    } catch (error) {
+      setSubmitError(error)
+    } finally {
+      submitInFlightRef.current = false
+      setIsSubmitting(false)
+    }
+  }, [answers, isFinished, onComplete, questions, totalTimeSeconds])
+
+  const submitRef = useRef(handleSubmitTest)
+  useEffect(() => {
+    submitRef.current = handleSubmitTest
+  }, [handleSubmitTest])
+
+  useEffect(() => {
+    if (!isStarted || isFinished || questionsStatus !== 'ready') return undefined
+
+    const updateRemaining = () => {
+      const remaining = Math.max(0, Math.ceil(((deadlineRef.current || Date.now()) - Date.now()) / 1000))
+      setTimeRemaining(remaining)
+    }
+    updateRemaining()
+    const timer = setInterval(updateRemaining, 1000)
 
     return () => clearInterval(timer)
-  }, [isFinished, timeRemaining])
+  }, [isFinished, isStarted, questionsStatus])
 
-  // Format waktu MM:SS (contoh 09:40)
-  const formattedTime = useCallback(() => {
-    const minutes = Math.floor(timeRemaining / 60)
-    const seconds = timeRemaining % 60
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-  }, [timeRemaining])
+  useEffect(() => {
+    if (
+      isStarted
+      && timeRemaining === 0
+      && !isFinished
+      && !isSubmitting
+      && !autoSubmitAttemptedRef.current
+    ) {
+      autoSubmitAttemptedRef.current = true
+      submitRef.current()
+    }
+  }, [isFinished, isStarted, isSubmitting, timeRemaining])
 
-  const currentQuestion = questions[currentIndex] || questions[0]
-  const currentAnswer = answers[currentQuestion.id] || null
-
-  // Aksi memilih jawaban
-  const handleSelectOption = (optionId) => {
-    setAnswers((prev) => ({
-      ...prev,
+  const handleSelectOption = useCallback((optionId) => {
+    if (!currentQuestion || isSubmitting || isFinished) return
+    setAnswers((previous) => ({
+      ...previous,
       [currentQuestion.id]: {
-        ...prev[currentQuestion.id],
+        ...previous[currentQuestion.id],
         selectedOption: optionId,
-        isDoubtful: prev[currentQuestion.id]?.isDoubtful || false,
+        isDoubtful: previous[currentQuestion.id]?.isDoubtful || false,
       },
     }))
-  }
+  }, [currentQuestion, isFinished, isSubmitting])
 
-  // Aksi "Coba Ulang" (Mereset jawaban pada soal aktif)
-  const handleResetAnswer = () => {
-    setAnswers((prev) => {
-      const updated = { ...prev }
-      if (updated[currentQuestion.id]) {
-        updated[currentQuestion.id] = {
-          ...updated[currentQuestion.id],
-          selectedOption: null,
-        }
-      }
-      return updated
-    })
-  }
-
-  // Aksi menandai ragu-ragu
-  const handleToggleDoubtful = () => {
-    setAnswers((prev) => ({
-      ...prev,
+  const handleResetAnswer = useCallback(() => {
+    if (!currentQuestion || isSubmitting) return
+    setAnswers((previous) => ({
+      ...previous,
       [currentQuestion.id]: {
-        ...prev[currentQuestion.id],
-        selectedOption: prev[currentQuestion.id]?.selectedOption || null,
-        isDoubtful: !prev[currentQuestion.id]?.isDoubtful,
+        ...previous[currentQuestion.id],
+        selectedOption: null,
       },
     }))
-  }
+  }, [currentQuestion, isSubmitting])
 
-  // Navigasi soal
-  const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1)
-    }
-  }
+  const handleToggleDoubtful = useCallback(() => {
+    if (!currentQuestion || isSubmitting) return
+    setAnswers((previous) => ({
+      ...previous,
+      [currentQuestion.id]: {
+        ...previous[currentQuestion.id],
+        selectedOption: previous[currentQuestion.id]?.selectedOption ?? null,
+        isDoubtful: !previous[currentQuestion.id]?.isDoubtful,
+      },
+    }))
+  }, [currentQuestion, isSubmitting])
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1)
-    }
-  }
+  const handleNext = useCallback(() => {
+    if (isSubmitting) return
+    setCurrentIndex((index) => Math.min(questions.length - 1, index + 1))
+  }, [isSubmitting, questions.length])
 
-  const handleGoToQuestion = (index) => {
-    if (index >= 0 && index < questions.length) {
-      setCurrentIndex(index)
-    }
-  }
+  const handlePrev = useCallback(() => {
+    if (isSubmitting) return
+    setCurrentIndex((index) => Math.max(0, index - 1))
+  }, [isSubmitting])
 
-  // Pengiriman data jawaban akhir (Siap kirim ke Backend API)
-  const handleSubmitTest = async () => {
-    setIsSubmitting(true)
+  const handleGoToQuestion = useCallback((index) => {
+    if (isSubmitting || index < 0 || index >= questions.length) return
+    setCurrentIndex(index)
+  }, [isSubmitting, questions.length])
 
-    const domainStats = {}
-    questions.forEach((q) => {
-      if (!domainStats[q.category]) {
-        domainStats[q.category] = { name: q.category, correct: 0, total: 0 }
-      }
-      domainStats[q.category].total += 1
-      if (answers[q.id]?.selectedOption === q.correctOption) {
-        domainStats[q.category].correct += 1
-      }
-    })
-
-    const submissionPayload = {
-      completedAt: new Date().toISOString(),
-      totalTimeSpentSeconds: totalTimeSeconds - timeRemaining,
-      totalQuestions: questions.length,
-      score: Object.values(domainStats).reduce((n, d) => n + d.correct, 0),
-      total: questions.length,
-      domains: Object.values(domainStats).map((d) => ({
-        name: d.name,
-        percent: Math.round((d.correct / d.total) * 100),
-      })),
-      answers: Object.entries(answers).map(([qId, ans]) => ({
-        questionId: Number(qId),
-        selectedOption: ans.selectedOption,
-        isDoubtful: Boolean(ans.isDoubtful),
-      })),
-    }
-
-    console.log('[Diagnostic] Payload Siap Backend:', submissionPayload)
-
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsFinished(true)
-      if (onComplete) {
-        onComplete(submissionPayload)
-      }
-    }, 600)
-  }
-
-  // Status progres
-  const totalAnswered = Object.values(answers).filter((a) => a.selectedOption).length
-  const progressPercent = Math.round(((currentIndex + 1) / questions.length) * 100)
+  const totalAnswered = Object.values(answers).filter((answer) => answer.selectedOption).length
+  const progressPercent = questions.length
+    ? Math.round(((currentIndex + 1) / questions.length) * 100)
+    : 0
 
   return {
     questions,
+    questionsStatus,
+    loadError,
     currentQuestion,
     currentIndex,
     totalQuestions: questions.length,
     currentAnswer,
     answers,
     timeRemaining,
-    formattedTime: formattedTime(),
+    formattedTime: `${String(Math.floor(timeRemaining / 60)).padStart(2, '0')}:${String(timeRemaining % 60).padStart(2, '0')}`,
     progressPercent,
     totalAnswered,
     isSubmitting,
+    submitError: submitError
+      ? getErrorMessage(submitError, 'Tes gagal dikirim. Jawabanmu tetap tersimpan di halaman ini.')
+      : null,
+    submitErrorStatus: submitError?.status ?? null,
     isFinished,
-    // Actions
+    completionResult,
+    startTest,
+    retryLoadQuestions,
     selectOption: handleSelectOption,
     resetCurrentAnswer: handleResetAnswer,
     toggleDoubtful: handleToggleDoubtful,

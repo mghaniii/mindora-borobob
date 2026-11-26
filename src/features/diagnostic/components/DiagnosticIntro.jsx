@@ -10,7 +10,13 @@ import illustrationAdventure from '../../../assets/diagnostic/illustration-adven
  * Mengacu pada desain Figma rencana.md (baris 80-135)
  * Memanfaatkan langsung file aset SVG tanpa penumpukan kode mentah di JSX
  */
-export default function DiagnosticIntro({ onStart }) {
+export default function DiagnosticIntro({
+  onStart,
+  totalQuestions = 0,
+  isLoading = false,
+  error = '',
+  onRetry,
+}) {
   return (
     <div className="w-full flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-20 xl:px-28 py-8 sm:py-12 lg:py-16">
       <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
@@ -64,11 +70,26 @@ export default function DiagnosticIntro({ onStart }) {
                   Jumlah Soal
                 </span>
                 <span className="text-base font-bold text-text-main font-rubik">
-                  15 Soal Seru
+                  {isLoading ? 'Memuat soal…' : `${totalQuestions} Soal Seru`}
                 </span>
               </div>
             </div>
           </div>
+
+          {error && (
+            <div className="w-full rounded-2xl bg-wrong p-4 flex flex-col gap-3 text-sm text-danger" role="alert">
+              <span>{error}</span>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="self-start font-bold text-primary hover:text-primary-dark cursor-pointer"
+                >
+                  Coba muat lagi
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Bagian Tombol CTA & Catatan Istirahat */}
           <div className="flex flex-col items-start gap-3 w-full sm:w-auto">
@@ -76,9 +97,11 @@ export default function DiagnosticIntro({ onStart }) {
               variant="primary"
               size="lg"
               onClick={onStart}
+              isLoading={isLoading}
+              disabled={isLoading || totalQuestions === 0}
               className="w-full sm:w-auto"
             >
-              Mulai Tes Sekarang
+              {isLoading ? 'Menyiapkan Soal' : 'Mulai Tes Sekarang'}
             </Button>
             <p className="text-xs text-text-subtle font-normal">
               *Kamu bisa menjeda tes kapan saja jika perlu beristirahat.

@@ -1,17 +1,22 @@
 import React, { useEffect } from 'react'
 
-/**
- * Konfirmasi sebelum mengakhiri kuis lebih awal.
- */
-export default function KuisConfirmModal({ isOpen, answeredCount, totalQuestions, onCancel, onConfirm }) {
+export default function KuisConfirmModal({
+  isOpen,
+  answeredCount,
+  totalQuestions,
+  isSubmitting = false,
+  submitError = '',
+  onCancel,
+  onConfirm,
+}) {
   useEffect(() => {
-    if (!isOpen) return undefined
+    if (!isOpen || isSubmitting) return undefined
     const onKey = (event) => {
       if (event.key === 'Escape') onCancel()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isOpen, onCancel])
+  }, [isOpen, isSubmitting, onCancel])
 
   if (!isOpen) return null
 
@@ -24,7 +29,8 @@ export default function KuisConfirmModal({ isOpen, answeredCount, totalQuestions
         tabIndex={-1}
         aria-label="Tutup konfirmasi"
         onClick={onCancel}
-        className="absolute inset-0 bg-shadow/40 backdrop-blur-[2px] cursor-default"
+        disabled={isSubmitting}
+        className="absolute inset-0 bg-shadow/40 backdrop-blur-[2px] cursor-default disabled:cursor-wait"
       />
       <dialog
         open
@@ -49,9 +55,7 @@ export default function KuisConfirmModal({ isOpen, answeredCount, totalQuestions
 
         <div className="bg-surface-card rounded-xl px-4 py-3 flex items-center justify-between text-sm font-rubik">
           <span className="text-text-muted">Soal terjawab</span>
-          <span className="font-bold text-text-main tabular-nums">
-            {answeredCount} / {totalQuestions}
-          </span>
+          <span className="font-bold text-text-main tabular-nums">{answeredCount} / {totalQuestions}</span>
         </div>
         {unanswered > 0 && (
           <p className="text-xs font-semibold text-warning -mt-2">
@@ -59,20 +63,26 @@ export default function KuisConfirmModal({ isOpen, answeredCount, totalQuestions
           </p>
         )}
 
+        {submitError && (
+          <p className="rounded-xl bg-wrong p-3 text-sm text-danger" role="alert">{submitError}</p>
+        )}
+
         <div className="flex gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-full bg-surface-card py-3 text-sm font-bold font-rubik text-text-main hover:bg-surface-muted active:scale-[0.98] transition-all cursor-pointer"
+            disabled={isSubmitting}
+            className="flex-1 rounded-full bg-surface-card py-3 text-sm font-bold font-rubik text-text-main hover:bg-surface-muted active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
             Lanjut Mengerjakan
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 rounded-full bg-danger py-3 text-sm font-bold font-rubik text-white hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer"
+            disabled={isSubmitting}
+            className="flex-1 rounded-full bg-danger py-3 text-sm font-bold font-rubik text-white hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-wait"
           >
-            Akhiri & Lihat Hasil
+            {isSubmitting ? 'Mengirim…' : 'Akhiri & Lihat Hasil'}
           </button>
         </div>
       </dialog>

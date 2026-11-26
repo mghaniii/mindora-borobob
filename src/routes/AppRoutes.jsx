@@ -8,6 +8,7 @@ import Dashboard from '../pages/Dashboard'
 import Diagnostic from '../pages/Diagnostic'
 import DiagnosticHistory from '../pages/DiagnosticHistory'
 import Materi from '../pages/Materi'
+import MateriDetail from '../pages/MateriDetail'
 import Latihan from '../pages/Latihan'
 import LatihanKuis from '../pages/LatihanKuis'
 import ForgotPassword from '../pages/ForgotPassword'
@@ -59,6 +60,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <Materi />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/materi/:materialId"
+        element={
+          <ProtectedRoute>
+            <MateriDetail />
           </ProtectedRoute>
         }
       />
