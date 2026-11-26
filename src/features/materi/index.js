@@ -13,4 +13,5 @@ export {
 }
 
 export * from './services/materiService.js'
+export { default as useMateriData } from './hooks/useMateriData.js'
 export default KatalogMateriCard

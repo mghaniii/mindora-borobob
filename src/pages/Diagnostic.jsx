@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   DiagnosticHeader,
@@ -14,56 +14,65 @@ import Button from '../components/common/Button'
 import { useAuth } from '../features/auth'
 import { saveDiagnosticResult } from '../features/auth/authService'
 
-/**
- * Halaman Utama Diagnostic (Tes Adaptif)
- * Mengatur alur: Intro -> Pengerjaan Soal (StatusBar, Kolom Kiri, Kolom Kanan, & Modal Pemilih Soal) -> Hasil Tes
- * Penempatan tata letak 100% presisi sesuai Design/soal 1-diagnostic.svg
- */
 export default function Diagnostic() {
   const navigate = useNavigate()
   const { markDiagnosticCompleted, logout } = useAuth()
-  const [currentStep, setCurrentStep] = useState('intro') // 'intro' | 'question' | 'result'
+  const [currentStep, setCurrentStep] = useState('intro')
   const [submissionResult, setSubmissionResult] = useState(null)
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
 
-    // Hook Logika Diagnostik
   const diagnostic = useDiagnosticLogic({
     totalTimeSeconds: 600,
-    onComplete: (payload) => {
-  saveDiagnosticResult(payload)
-  markDiagnosticCompleted()
-  setSubmissionResult(payload)
-  setCurrentStep('result')
-},
+    onComplete: (result) => {
+      saveDiagnosticResult(result)
+      markDiagnosticCompleted()
+      setSubmissionResult(result)
+      setCurrentStep('result')
+    },
   })
 
+  useEffect(() => {
+    if (diagnostic.loadError?.status === 401 || diagnostic.submitErrorStatus === 401) {
+      logout()
+      navigate('/login', { replace: true })
+    }
+  }, [diagnostic.loadError, diagnostic.submitErrorStatus, logout, navigate])
+
   const handleStartTest = () => {
+    diagnostic.startTest()
     setCurrentStep('question')
   }
 
   const handleExit = () => {
-  logout()
-  navigate('/login', { replace: true })
-}
+    logout()
+    navigate('/login', { replace: true })
+  }
+
+  const loadError = typeof diagnostic.loadError === 'string'
+    ? diagnostic.loadError
+    : diagnostic.loadError
+      ? diagnostic.loadError.data?.message || diagnostic.loadError.message
+      : ''
 
   return (
-    <div className="min-h-screen w-full bg-[#F7F9FB] flex flex-col justify-between selection:bg-primary/20 selection:text-primary">
-      {/* 1. Header Aplikasi Paling Atas */}
+    <div className="min-h-screen w-full bg-surface-bg flex flex-col justify-between selection:bg-primary/20 selection:text-primary">
       <DiagnosticHeader onExit={handleExit} />
 
-      {/* 2. Konten Berdasarkan Tahapan */}
       <main className="flex-1 flex flex-col justify-start">
-        {/* Tahap 1: Pengantar Tes (Intro) */}
         {currentStep === 'intro' && (
           <div className="flex-1 flex items-center justify-center">
-            <DiagnosticIntro onStart={handleStartTest} />
+            <DiagnosticIntro
+              onStart={handleStartTest}
+              totalQuestions={diagnostic.totalQuestions}
+              isLoading={diagnostic.questionsStatus === 'loading'}
+              error={loadError}
+              onRetry={diagnostic.retryLoadQuestions}
+            />
           </div>
         )}
 
-        {/* Tahap 2: Pengerjaan Soal (Sesuai Desain Asli soal 1-diagnostic.svg) */}
-        {currentStep === 'question' && (
+        {currentStep === 'question' && diagnostic.currentQuestion && (
           <div className="w-full max-w-[1248px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col gap-3.5">
-            {/* Top Bar Status Pengerjaan (Full-Width di Atas Kedua Kolom) */}
             <DiagnosticStatusBar
               questionNumber={diagnostic.currentIndex + 1}
               totalQuestions={diagnostic.totalQuestions}
@@ -73,7 +82,6 @@ export default function Diagnostic() {
               onOpenPalette={() => setIsPaletteOpen(true)}
             />
 
-            {/* Grid 2 Kolom: Kiri (Soal & Langkah) dan Kanan (Pilihan & Navigasi) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
               <div className="lg:col-span-7 flex flex-col gap-3.5">
                 <QuestionDisplay
@@ -82,39 +90,33 @@ export default function Diagnostic() {
                 />
               </div>
 
-              {/* Kolom Kanan (Lebar ~42%, 5 Kolom): Pilihan Jawaban (A, B, C, D) & Tombol Aksi (Coba Ulang & Lanjut) */}
               <div className="lg:col-span-5 flex flex-col gap-3.5 sticky top-20">
-                {/* Pilihan Jawaban A, B, C, D (Model A: Instant Feedback) */}
                 <QuestionOptions
                   options={diagnostic.currentQuestion.options}
                   selectedOption={diagnostic.currentAnswer?.selectedOption || null}
-                  correctOption={diagnostic.currentQuestion.correctOption || 'B'}
                   onSelect={diagnostic.selectOption}
                 />
 
-                {/* Panel Navigasi Bawah: Tombol Coba Ulang, Lanjut ke Soal N, & Navigasi Langsung Soal */}
                 <QuestionNavigation
                   currentIndex={diagnostic.currentIndex}
                   totalQuestions={diagnostic.totalQuestions}
                   questions={diagnostic.questions}
                   answers={diagnostic.answers}
-                  isDoubtful={diagnostic.currentAnswer?.isDoubtful || false}
                   isSubmitting={diagnostic.isSubmitting}
+                  submitError={diagnostic.submitError}
                   onResetAnswer={diagnostic.resetCurrentAnswer}
                   onNext={diagnostic.nextQuestion}
                   onSelectQuestion={diagnostic.goToQuestion}
-                  onToggleDoubtful={diagnostic.toggleDoubtful}
-                  onOpenPalette={() => setIsPaletteOpen(true)}
                   onSubmit={diagnostic.submitTest}
                 />
               </div>
             </div>
 
-            {/* Modal Pop-up Daftar Nomor Soal (1-15) */}
             <QuestionPaletteModal
               isOpen={isPaletteOpen}
               onClose={() => setIsPaletteOpen(false)}
               totalQuestions={diagnostic.totalQuestions}
+              questions={diagnostic.questions}
               currentIndex={diagnostic.currentIndex}
               answers={diagnostic.answers}
               onSelectQuestion={diagnostic.goToQuestion}
@@ -122,7 +124,6 @@ export default function Diagnostic() {
           </div>
         )}
 
-        {/* Tahap 3: Hasil / Konfirmasi Tes Selesai */}
         {currentStep === 'result' && (
           <div className="flex-1 flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-lg bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-md flex flex-col items-center text-center gap-6">
@@ -146,12 +147,18 @@ export default function Diagnostic() {
                 </p>
               </div>
 
-              {/* Ringkasan Singkat */}
               <div className="w-full bg-slate-50 rounded-2xl p-4 border border-slate-200/60 flex items-center justify-around">
                 <div className="flex flex-col">
                   <span className="text-xs text-text-subtle font-normal font-rubik">Soal Terjawab</span>
                   <span className="text-lg font-bold text-text-main font-rubik">
-                    {diagnostic.totalAnswered} / {diagnostic.totalQuestions}
+                    {submissionResult?.answeredCount ?? diagnostic.totalAnswered} / {submissionResult?.totalQuestions ?? diagnostic.totalQuestions}
+                  </span>
+                </div>
+                <div className="h-8 w-px bg-slate-200" />
+                <div className="flex flex-col">
+                  <span className="text-xs text-text-subtle font-normal font-rubik">Skor Diagnostik</span>
+                  <span className="text-lg font-bold text-text-main font-rubik">
+                    {submissionResult?.scorePercent ?? 0}%
                   </span>
                 </div>
                 <div className="h-8 w-px bg-slate-200" />
@@ -164,6 +171,39 @@ export default function Diagnostic() {
                   </span>
                 </div>
               </div>
+
+              {submissionResult?.review?.length > 0 && (
+                <details className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left">
+                  <summary className="cursor-pointer font-rubik text-sm font-bold text-primary-dark">
+                    Lihat Pembahasan
+                  </summary>
+                  <div className="mt-4 flex flex-col gap-3">
+                    {submissionResult.review.map((item) => (
+                      <div key={item.questionId} className="rounded-xl bg-slate-50 p-4 flex flex-col gap-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="text-xs font-bold text-text-main">
+                            Soal {item.number} • {item.category}
+                          </span>
+                          <span className={`text-xs font-bold ${item.isCorrect ? 'text-emerald-700' : 'text-danger'}`}>
+                            {item.isCorrect ? 'Benar' : 'Belum tepat'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-text-main">{item.questionText}</p>
+                        <p className="text-xs text-text-muted">
+                          Jawabanmu: {item.selectedOption || 'Tidak dijawab'} • Kunci: {item.correctOption}
+                        </p>
+                        {item.steps?.map((step) => (
+                          <p key={step.step} className="text-xs text-text-muted leading-relaxed">
+                            <strong className="text-text-main">{step.title}: </strong>
+                            {step.description || step.label}
+                          </p>
+                        ))}
+                        {item.hint && <p className="text-xs text-text-muted"><strong>Trik: </strong>{item.hint}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
 
               <Button
                 variant="primary"

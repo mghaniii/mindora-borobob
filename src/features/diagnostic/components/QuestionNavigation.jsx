@@ -20,6 +20,7 @@ export default function QuestionNavigation({
   questions = [],
   answers = {},
   isSubmitting = false,
+  submitError = '',
   onResetAnswer,
   onNext,
   onSelectQuestion,
@@ -36,7 +37,8 @@ export default function QuestionNavigation({
         <button
           type="button"
           onClick={onResetAnswer}
-          className="w-full h-10 px-4 bg-[#ECEEF0] text-[#191C1E] rounded-xl font-rubik text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 hover:bg-slate-300/80 active:scale-[0.98] cursor-pointer"
+          disabled={isSubmitting}
+          className="w-full h-10 px-4 bg-[#ECEEF0] text-[#191C1E] rounded-xl font-rubik text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 hover:bg-slate-300/80 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
           {/* Ikon Refresh */}
           <svg
@@ -63,7 +65,11 @@ export default function QuestionNavigation({
           className="w-full h-10 px-4 bg-primary text-white rounded-xl font-rubik text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] cursor-pointer shadow-xs disabled:opacity-50"
         >
           <span>
-            {isLastQuestion ? 'Kumpulkan' : `Lanjut ke Soal ${nextQuestionNumber}`}
+            {isSubmitting
+              ? 'Mengirim…'
+              : isLastQuestion
+                ? 'Kumpulkan'
+                : `Lanjut ke Soal ${nextQuestionNumber}`}
           </span>
           {/* Ikon Panah Kanan Sesuai Desain */}
           <svg
@@ -81,6 +87,20 @@ export default function QuestionNavigation({
         </button>
       </div>
 
+      {submitError && (
+        <div className="rounded-xl bg-wrong p-3 flex items-center justify-between gap-3 text-xs text-danger" role="alert">
+          <span>{submitError}</span>
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={isSubmitting}
+            className="shrink-0 font-bold text-primary hover:text-primary-dark cursor-pointer disabled:opacity-50"
+          >
+            Kirim ulang
+          </button>
+        </div>
+      )}
+
       {/* 2. Bagian Navigasi Langsung Soal */}
       <div className="flex flex-col gap-2 pt-0.5">
         <span className="text-[10px] sm:text-[11px] font-extrabold font-rubik tracking-wider text-[#191C1E]/80 uppercase">
@@ -95,36 +115,29 @@ export default function QuestionNavigation({
             const questionId = questionData.id || questionNumber
             const answer = answers[questionId]
             const isAnswered = Boolean(answer?.selectedOption)
-
-            
-            // Cek apakah jawaban benar / salah
-            const correctOption = questionData.correctOption || 'B'
-            const isCorrect = isAnswered && answer.selectedOption === correctOption
-            const isWrong = isAnswered && answer.selectedOption !== correctOption
+            const isDoubtful = Boolean(answer?.isDoubtful)
             const isCurrent = currentIndex === index
 
-            // Tentukan style badge nomor berdasarkan state
-            let buttonStyle = 'bg-[#ECEEF0] text-[#191C1E] hover:bg-slate-300/80'
-
-            if (isWrong) {
-              buttonStyle = 'bg-wrong text-[#D92D20] font-bold hover:bg-[#FFDFDF]'
-            } else if (isCorrect) {
-              buttonStyle = 'bg-correct-light text-[#191C1E] font-bold hover:bg-[#D1FAE5]'
+            let buttonStyle = 'bg-slate-100 text-text-muted hover:bg-slate-200/80'
+            if (isDoubtful) {
+              buttonStyle = 'bg-amber-100 text-amber-900 font-bold hover:bg-amber-200'
+            } else if (isAnswered) {
+              buttonStyle = 'bg-primary/10 text-primary-dark font-bold hover:bg-primary/15'
             }
 
             return (
               <button
                 key={questionNumber}
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => onSelectQuestion && onSelectQuestion(index)}
-                className={`h-9.5 min-w-[56px] sm:min-w-[64px] flex-1 px-2.5 rounded-lg font-rubik text-xs sm:text-sm font-bold flex items-center justify-center gap-1 transition-all duration-150 cursor-pointer active:scale-95 ${buttonStyle} ${
-                  isCurrent ? 'bg-slate-300/80 shadow-xs' : ''
+                className={`h-9.5 min-w-[56px] sm:min-w-[64px] flex-1 px-2.5 rounded-lg font-rubik text-xs sm:text-sm font-bold flex items-center justify-center gap-1 transition-all duration-150 cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-50 ${buttonStyle} ${
+                  isCurrent ? 'ring-2 ring-primary/40 shadow-xs' : ''
                 }`}
                 title={`Pilih Soal Nomor ${questionNumber}`}
               >
                 <span>{questionNumber}</span>
-                {isWrong && <span className="text-[11px] font-black">✕</span>}
-                {isCorrect && <span className="text-[11px] font-black">✓</span>}
+                {isDoubtful && <span className="text-[11px] font-black">•</span>}
               </button>
             )
           })}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   useLatihanKuis,
@@ -11,16 +11,21 @@ import {
   KuisResult,
 } from '../features/latihan'
 import Button from '../components/common/Button'
+import { useAuth } from '../features/auth'
 
-/**
- * Halaman pengerjaan kuis latihan (Desain: Design/kuis-design-dekstop.png).
- * Alur: loading -> pengerjaan soal -> hasil.
- */
 export default function LatihanKuis() {
   const { itemId } = useParams()
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const kuis = useLatihanKuis(itemId)
+
+  useEffect(() => {
+    if (kuis.loadError?.status === 401 || kuis.submitErrorStatus === 401) {
+      logout()
+      navigate('/login', { replace: true })
+    }
+  }, [kuis.loadError, kuis.submitErrorStatus, logout, navigate])
 
   if (kuis.status === 'loading') {
     return (
@@ -36,7 +41,11 @@ export default function LatihanKuis() {
     )
   }
 
-  if (kuis.status === 'not-found') {
+  if (kuis.status === 'not-found' || kuis.status === 'error') {
+    const message = kuis.status === 'not-found'
+      ? 'Modul latihan yang kamu tuju tidak tersedia. Kembali ke daftar latihan untuk memilih modul lain.'
+      : kuis.loadError?.data?.message || kuis.loadError?.message || 'Kuis gagal dimuat.'
+
     return (
       <div className="min-h-screen bg-surface-bg flex items-center justify-center px-4 font-sans">
         <div className="bg-white rounded-3xl p-10 max-w-md w-full shadow-xs flex flex-col items-center text-center gap-5">
@@ -48,12 +57,17 @@ export default function LatihanKuis() {
             </svg>
           </div>
           <div className="flex flex-col gap-2">
-            <h1 className="font-rubik text-xl font-extrabold text-text-main">Latihan Tidak Ditemukan</h1>
-            <p className="text-sm text-text-muted leading-relaxed">
-              Modul latihan yang kamu tuju tidak tersedia. Kembali ke daftar latihan untuk memilih modul lain.
-            </p>
+            <h1 className="font-rubik text-xl font-extrabold text-text-main">
+              {kuis.status === 'not-found' ? 'Latihan Tidak Ditemukan' : 'Kuis Gagal Dimuat'}
+            </h1>
+            <p className="text-sm text-text-muted leading-relaxed">{message}</p>
           </div>
-          <Button variant="primary" size="md" shape="pill" withArrow onClick={() => navigate('/latihan')} className="w-full font-bold">
+          {kuis.status === 'error' && (
+            <Button variant="primary" size="md" shape="pill" onClick={kuis.retry} className="w-full font-bold">
+              Coba Muat Lagi
+            </Button>
+          )}
+          <Button variant="outline-primary" size="md" shape="pill" onClick={() => navigate('/latihan')} className="w-full font-bold">
             Kembali ke Latihan
           </Button>
         </div>
@@ -68,7 +82,7 @@ export default function LatihanKuis() {
           config={kuis.config}
           result={kuis.result}
           onRestart={kuis.restart}
-          onExit={() => navigate('/latihan')}
+          onExit={() => navigate('/dashboard')}
         />
       </div>
     )
@@ -83,7 +97,7 @@ export default function LatihanKuis() {
           questionNumber={kuis.currentIndex + 1}
           totalQuestions={kuis.totalQuestions}
           formattedTime={kuis.formattedTime}
-          onEnd={() => setIsConfirmOpen(true)}
+          onEnd={() => !kuis.isSubmitting && setIsConfirmOpen(true)}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -111,9 +125,12 @@ export default function LatihanKuis() {
           currentIndex={kuis.currentIndex}
           totalQuestions={kuis.totalQuestions}
           isDoubtful={kuis.currentAnswer?.isDoubtful ?? false}
+          isSubmitting={kuis.isSubmitting}
+          submitError={kuis.submitError}
           onPrev={kuis.prevQuestion}
           onToggleDoubtful={kuis.toggleDoubtful}
           onNext={kuis.nextQuestion}
+          onRetrySubmit={kuis.submitTest}
         />
       </div>
 
@@ -121,11 +138,10 @@ export default function LatihanKuis() {
         isOpen={isConfirmOpen}
         answeredCount={kuis.answeredCount}
         totalQuestions={kuis.totalQuestions}
+        isSubmitting={kuis.isSubmitting}
+        submitError={kuis.submitError}
         onCancel={() => setIsConfirmOpen(false)}
-        onConfirm={() => {
-          setIsConfirmOpen(false)
-          kuis.submitTest()
-        }}
+        onConfirm={kuis.submitTest}
       />
     </div>
   )

@@ -6,10 +6,10 @@ import React from 'react'
  * Mengacu pada desain Button material card rekomendasi.svg
  */
 export function RecommendationCard({
-  title = 'Aljabar Dasar Mudah',
-  category = 'Aljabar',
-  description = 'Mengenal variabel, suku sejenis, dan model matematika sederhana.',
-  moduleCount = 6,
+  title,
+  category,
+  description = '',
+  moduleCount = 0,
   tagColor = 'text-primary',
   bannerBg = 'bg-primary/10',
   image = null,
@@ -59,7 +59,7 @@ export function RecommendationCard({
         </span>
         <button 
           aria-label={`Mulai materi ${title}`}
-          className="w-8 h-8 rounded-full bg-[#E8EFF1] group-hover:bg-primary group-hover:text-white text-[#474554] flex items-center justify-center transition-colors duration-200 shrink-0 cursor-pointer"
+          className="w-8 h-8 rounded-full bg-slate-200 group-hover:bg-primary group-hover:text-white text-text-muted flex items-center justify-center transition-colors duration-200 shrink-0 cursor-pointer"
         >
           <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
             <path

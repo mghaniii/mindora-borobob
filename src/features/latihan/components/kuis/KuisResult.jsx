@@ -65,7 +65,7 @@ export default function KuisResult({ config, result, onRestart, onExit }) {
             Ulangi Kuis
           </Button>
           <Button variant="primary" size="md" shape="pill" withArrow onClick={onExit} className="flex-1 font-bold">
-            Kembali ke Latihan
+            Kembali ke Dashboard
           </Button>
         </div>
       </section>

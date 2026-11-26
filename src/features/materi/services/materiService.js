@@ -1,9 +1,7 @@
-/**
- * Service & Data Model untuk Katalog Materi Matematika
- */
+import { api } from '../../../services/api.js'
 
 export const CATEGORIES = [
-  { id: 'all', label: 'Semua Materi', count: 12 },
+  { id: 'all', label: 'Semua Materi' },
   { id: 'bilangan', label: 'Bilangan & Pecahan' },
   { id: 'aljabar', label: 'Aljabar Dasar' },
   { id: 'geometri', label: 'Geometri & Pengukuran' },
@@ -24,150 +22,137 @@ export const SORT_OPTIONS = [
   { value: 'progres', label: 'Progres Tertinggi' },
 ]
 
-export const KATALOG_MATERI = [
-  {
-    id: 'mat-1',
-    category: 'Bilangan Rasional',
-    categoryColor: 'bg-violet-100 text-primary',
-    categoryFilter: 'bilangan',
-    title: 'Operasi Pecahan Campuran',
-    description: 'Menghitung penjumlahan, pengurangan, dan penyederhanaan bentuk pecahan tidak sejenis.',
-    statusType: 'in_progress',
-    statusLabel: 'Progres Pembelajaran',
-    statusValue: '75% (3/4 Sub-bab)',
-    progressPercent: 75,
-    exercisesCount: 8,
-    durationMinutes: 25,
-    actionButton: {
-      label: 'Lanjutkan Belajar',
-      variant: 'primary',
-    },
-  },
-  {
-    id: 'mat-2',
-    category: 'Bilangan Bulat',
-    categoryColor: 'bg-indigo-50 text-indigo-700',
-    categoryFilter: 'bilangan',
-    title: 'Bilangan Bulat & Garis Bilangan',
-    description: 'Konsep dasar bilangan negatif, nilai mutlak, serta relasi posisi pada garis horizontal.',
-    statusType: 'completed',
-    statusLabel: 'Tuntas Sempurna',
-    statusValue: '100%',
-    progressPercent: 100,
-    exercisesCount: 6,
-    score: 'Skor: 95/100',
-    actionButton: {
-      label: 'Ulas Kembali Modul',
-      variant: 'review',
-    },
-  },
-  {
-    id: 'mat-3',
-    category: 'Aljabar Dasar',
-    categoryColor: 'bg-purple-100/80 text-purple-800',
-    categoryFilter: 'aljabar',
-    title: 'Pengenalan Variabel & Bentuk Aljabar',
-    description: 'Memahami koefisien, konstanta, suku sejenis, serta menyusun persamaan ekspresif.',
-    statusType: 'ready',
-    statusLabel: 'Status: Siap Dipelajari',
-    statusValue: '+120 XP Reward',
-    exercisesCount: 10,
-    durationMinutes: 35,
-    actionButton: {
-      label: 'Mulai Bab Ini',
-      variant: 'ready',
-    },
-  },
-  {
-    id: 'mat-4',
-    category: 'Aljabar Lanjutan',
-    categoryColor: 'bg-slate-100 text-slate-700',
-    categoryFilter: 'aljabar',
-    title: 'Persamaan Linear Satu Variabel',
-    description: 'Menemukan nilai x pada bentuk aljabar setara melalui sifat kesamaan dan substitusi.',
-    statusType: 'prerequisite_progress',
-    statusLabel: 'Prasyarat: Variabel Aljabar',
-    statusValue: '0%',
-    progressPercent: 0,
-    exercisesCount: 8,
-    durationMinutes: 30,
-    actionButton: {
-      label: 'Lihat Silabus',
-      variant: 'syllabus',
-    },
-  },
-  {
-    id: 'mat-5',
-    category: 'Geometri Spasial',
-    categoryColor: 'bg-sky-50 text-sky-800',
-    categoryFilter: 'geometri',
-    title: 'Keliling & Luas Bangun Datar',
-    description: 'Perhitungan luas segitiga, jajar genjang, dan belah ketupat dalam pemecahan masalah kontekstual.',
-    statusType: 'locked_prerequisite',
-    lockMessage: 'Selesaikan modul Aljabar Dasar terlebih dahulu.',
-    lockHighlight: 'Aljabar Dasar',
-    exercisesCount: 12,
-    actionButton: {
-      label: 'Prasyarat Belum Terpenuhi',
-      variant: 'locked',
-      icon: 'lock',
-    },
-  },
-  {
-    id: 'mat-6',
-    category: 'Statistika',
-    categoryColor: 'bg-teal-50 text-teal-800',
-    categoryFilter: 'statistika',
-    title: 'Penyajian Data & Diagram Batang',
-    description: 'Mengolah tabel frekuensi, membaca diagram lingkaran, serta interpretasi sebaran data kuantitatif.',
-    statusType: 'locked_level',
-    lockMessage: 'Terbuka otomatis saat akun mencapai Level 4 Explorer.',
-    lockHighlight: 'Level 4 Explorer',
-    exercisesCount: 8,
-    actionButton: {
-      label: 'Perlu 120 XP Lagi',
-      variant: 'locked',
-      icon: 'trophy',
-    },
-  },
-]
+const CATEGORY_COLORS = {
+  bilangan: 'bg-violet-100 text-primary',
+  aljabar: 'bg-purple-100/80 text-purple-800',
+  geometri: 'bg-sky-50 text-sky-800',
+  statistika: 'bg-teal-50 text-teal-800',
+}
 
-/**
- * Filter dan sort helper untuk katalog materi
- */
-export function getFilteredMateri({ items = KATALOG_MATERI, activeTab = 'all', searchQuery = '', statusFilter = 'all', sortBy = 'rekomendasi' }) {
+const STATUS_PRESENTATION = {
+  in_progress: {
+    label: 'Progres Pembelajaran',
+    action: { label: 'Lanjutkan Belajar', variant: 'primary' },
+  },
+  completed: {
+    label: 'Tuntas Sempurna',
+    action: { label: 'Ulas Kembali Modul', variant: 'review' },
+  },
+  ready: {
+    label: 'Status: Siap Dipelajari',
+    action: { label: 'Mulai Bab Ini', variant: 'ready' },
+  },
+  prerequisite_progress: {
+    label: 'Prasyarat Belum Selesai',
+    action: { label: 'Lihat Silabus', variant: 'syllabus' },
+  },
+  locked_prerequisite: {
+    label: 'Prasyarat Belum Terpenuhi',
+    action: { label: 'Prasyarat Belum Terpenuhi', variant: 'locked', icon: 'lock' },
+  },
+  locked_level: {
+    label: 'Level Belum Mencukupi',
+    action: { label: 'Level Belum Mencukupi', variant: 'locked', icon: 'trophy' },
+  },
+}
+
+export function mapMaterialToCard(item) {
+  const status = STATUS_PRESENTATION[item.status] || STATUS_PRESENTATION.ready
+  const progress = Number(item.progress) || 0
+  const completedSubtopics = Number(item.completedSubtopics) || 0
+  const totalModules = Number(item.totalModules) || 0
+  const xpReward = Number(item.xpReward) || 0
+  const score = item.score === null || item.score === undefined
+    ? null
+    : `Skor: ${item.score}/100`
+  let statusValue = `${progress}%`
+
+  if (item.status === 'in_progress') {
+    statusValue = `${progress}% (${completedSubtopics}/${totalModules} Sub-bab)`
+  } else if (item.status === 'completed') {
+    statusValue = '100%'
+  } else if (item.status === 'ready') {
+    statusValue = `+${xpReward} XP Reward`
+  }
+
+  return {
+    ...item,
+    categoryColor: CATEGORY_COLORS[item.categoryFilter] || 'bg-slate-100 text-slate-700',
+    statusType: item.status,
+    statusLabel: status.label,
+    statusValue,
+    progressPercent: progress,
+    completedSubtopics,
+    totalModules,
+    xpReward,
+    score,
+    lockMessage: item.status === 'locked_prerequisite'
+      ? 'Selesaikan materi prasyarat terlebih dahulu.'
+      : item.status === 'locked_level'
+        ? 'Materi terbuka setelah level belajarmu meningkat.'
+        : '',
+    lockHighlight: item.status === 'locked_prerequisite'
+      ? 'materi prasyarat'
+      : item.status === 'locked_level'
+        ? 'level berikutnya'
+        : '',
+    actionButton: status.action,
+  }
+}
+
+export async function fetchMaterials() {
+  const response = await api.get('/materials')
+  return response.data.map(mapMaterialToCard)
+}
+
+export async function updateMaterialProgress(materialId, payload) {
+  const response = await api.patch(
+    `/materials/${encodeURIComponent(materialId)}/progress`,
+    payload,
+  )
+  return response.data
+}
+
+export function applyMaterialProgress(item, progress) {
+  return mapMaterialToCard({
+    ...item,
+    status: progress.status,
+    progress: progress.progressPercentage,
+    completedSubtopics: progress.completedSubtopics,
+    totalModules: progress.totalModules,
+    score: progress.score,
+  })
+}
+
+export function getFilteredMateri({
+  items = [],
+  activeTab = 'all',
+  searchQuery = '',
+  statusFilter = 'all',
+  sortBy = 'rekomendasi',
+}) {
   let result = [...items]
 
-  // 1. Filter Kategori Tab
   if (activeTab !== 'all') {
     result = result.filter((item) => item.categoryFilter === activeTab)
   }
 
-  // 2. Filter Search Query
-  if (searchQuery.trim() !== '') {
-    const q = searchQuery.toLowerCase().trim()
+  const query = searchQuery.toLowerCase().trim()
+  if (query) {
     result = result.filter((item) => {
-      const matchTitle = item.title.toLowerCase().includes(q)
-      const matchDesc = item.description.toLowerCase().includes(q)
-      const matchCat = item.category.toLowerCase().includes(q)
-      return matchTitle || matchDesc || matchCat
+      const title = item.title?.toLowerCase() || ''
+      const description = item.description?.toLowerCase() || ''
+      const category = item.category?.toLowerCase() || ''
+      return title.includes(query) || description.includes(query) || category.includes(query)
     })
   }
 
-  // 3. Filter Status
-  if (statusFilter !== 'all') {
-    if (statusFilter === 'in_progress') {
-      result = result.filter((item) => item.statusType === 'in_progress')
-    } else if (statusFilter === 'completed') {
-      result = result.filter((item) => item.statusType === 'completed')
-    } else if (statusFilter === 'ready') {
-      result = result.filter((item) => item.statusType === 'ready')
-    } else if (statusFilter === 'locked') {
-      result = result.filter((item) => item.statusType.startsWith('locked'))
-    }
+  if (statusFilter === 'locked') {
+    result = result.filter((item) => item.statusType?.startsWith('locked') || item.statusType === 'prerequisite_progress')
+  } else if (statusFilter !== 'all') {
+    result = result.filter((item) => item.statusType === statusFilter)
   }
 
-  // 4. Sortir
   if (sortBy === 'progres') {
     result.sort((a, b) => (b.progressPercent || 0) - (a.progressPercent || 0))
   }
